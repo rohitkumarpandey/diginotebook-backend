@@ -1,4 +1,4 @@
-const UserTask = require('../model/usertask');
+const UserData = require('../model/userdata');
 const Task = require('../model/task');
 
 let service = {};
@@ -6,14 +6,14 @@ let service = {};
 //adding task
 service.addTask = async(request, response)=>{
 
-    await UserTask.findOne({userid : request.params['userid']})
+    await UserData.findOne({userid : request.params['userid']})
     .then((user)=>{
         if(!user){ //if user doensn't has any task 
             Task.create(request.body)
             .then((taskcreated)=>{
                 //if task created successfully
                 if(taskcreated){
-                    UserTask.create({userid :  request.params['userid'] , tasks : taskcreated._id})
+                    UserData.create({userid :  request.params['userid'] , tasks : taskcreated._id})
                     .then((usercreated)=>{
                         //if user created successfully and task added to it
                         if(usercreated) return response.json('Task Added');
@@ -27,7 +27,7 @@ service.addTask = async(request, response)=>{
             .then((taskcreated)=>{
                 //if task created successfully
                 if(taskcreated){
-                    UserTask.updateOne({userid : user.userid}, {$addToSet : {tasks : taskcreated._id}})
+                    UserData.updateOne({userid : user.userid}, {$addToSet : {tasks : taskcreated._id}})
                     .then((updated)=>{
                         //if task added to user successfully
                         if(updated){
@@ -51,11 +51,25 @@ service.addTask = async(request, response)=>{
                 return response.status(400).json('Error occured in adding Task!')});
 }
 
-//get all user task
+//get all user pending tasks
 service.getUserTasks = async (request, response)=>{
-    await UserTask.findOne({userid: request.params['userid']})
-    .populate('tasks')
+    await UserData.findOne({userid: request.params['userid']})
+    .populate('tasks', null, {taskStatus:{ completed : false}})
     .then((user)=>{
+        if(user){
+            return response.status(200).send(user.tasks);
+        }else{
+            return response.status(200).json('You do not set any task yet');
+        }
+    });
+}
+
+//get all user completed tasks
+service.getCompletedTasks = async (request, response)=>{
+    await UserData.findOne({userid: request.params['userid']})
+    .populate('tasks', null, {taskStatus:{ completed : true}})
+    .then((user)=>{
+        console.log(user);
         if(user){
             return response.status(200).send(user.tasks);
         }else{
@@ -70,7 +84,7 @@ service.deleteTask = async (request, response)=>{
     await Task.findByIdAndDelete({_id: request.params['task_id']})
     .then((taskdeleted)=>{
         if(taskdeleted){
-                UserTask.updateOne({userid : request.params['user_id']}, {$pull : {tasks : request.params['task_id']}})
+            UserData.updateOne({userid : request.params['user_id']}, {$pull : {tasks : request.params['task_id']}})
                 .then((updated)=>{
                     if(updated){
                         return response.status(200).json('Task Deleted Succussfully');
@@ -81,7 +95,7 @@ service.deleteTask = async (request, response)=>{
     }else{
         return response.status(200).json('Failed to delete task');
 
-    }
+    }   
     });
 }
 
@@ -89,10 +103,22 @@ service.deleteTask = async (request, response)=>{
 service.updateTask = async (request, response)=>{
     await Task.updateOne({_id : request.params['task_id']}, request.body)
     .then((taskupdated)=>{
-        //if task deleted
+        //if task updated
         if(taskupdated) return response.status(200).json('Task Updated!');
         else return response.json('Failed to update task');
-    })
+    });
+}
+
+//mark Task completed
+service.taskCompleted = async (request, response)=>{
+    await Task.updateOne({_id : request.params['task_id']}, {taskStatus : {completed: request.body.taskCompleted , completionDate : Date.now()}})
+    .then((taskCompleted)=>{
+        if(taskCompleted){
+            return response.json('Task marked as completed');
+        }else{
+            return new Error('Failed to mark task completed');
+        }
+    });
 }
 
 module.exports = service;

@@ -3,9 +3,11 @@ const routes = express.Router();
 const registration = require('../services/register');
 const loginService = require('../services/login');
 const taskService = require('../services/task');
+const credentialService = require('../services/credential');
 
 //ping server
 routes.get('/pingserver', (request, response)=>{
+    
     return response.status(200).json('pinged server');
 });
 
@@ -28,9 +30,16 @@ routes.post('/addTask/:userid', (request, response)=>{
     
 });
 
-//get all task
-routes.get('/getTasks/:userid', (request, response, next)=>{
+//get all pending tasks
+routes.get('/getPendingTasks/:userid', (request, response, next)=>{
+   
     return taskService.getUserTasks(request, response);
+
+});
+//get all completed tasks
+routes.get('/getCompletedTasks/:userid', (request, response, next)=>{
+   
+    return taskService.getCompletedTasks(request, response);
 
 });
 
@@ -44,6 +53,26 @@ routes.delete('/deleteTask/:user_id/:task_id', (request, response, next)=>{
 routes.put('/updateTask/:task_id', (request, response, next)=>{
     return taskService.updateTask(request, response); 
 });
+
+//mark task completed
+routes.put('/taskCompleted/:task_id', (request, response, next)=>{
+    return taskService.taskCompleted(request, response); 
+});
+
+//add credential
+routes.post('/addCredential/:user_id', (request, response, next)=>{
+    
+    return credentialService.addCredential(request, response);
+
+});
+
+//get all credentials
+routes.get('/getAllCredentials/:userid', (request, response, next)=>{
+   
+    return credentialService.getAllCredentials(request, response);
+
+});
+
 
 //logout
 // router.get('/logout', (request, response)=>{

@@ -13,7 +13,11 @@ const task = new schema({
         type : Date,
         required : true
     },
-   
+    taskStatus :{
+        completed :{
+        type : Boolean,
+        default :false
+    },  completionDate : { type : Date}},   
     createdOn :{
         type:Date,
         default : Date.now
