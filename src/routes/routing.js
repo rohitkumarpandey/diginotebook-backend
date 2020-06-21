@@ -73,6 +73,17 @@ routes.get('/getAllCredentials/:userid', (request, response, next)=>{
 
 });
 
+//delete credential
+routes.delete('/deleteCredential/:user_id/:credential_id', (request, response, next)=>{
+    return credentialService.deleteCredential(request, response);
+
+});
+
+//update crdential
+routes.put('/updateCrdential/:credential_id', (request, response)=>{
+        return credentialService.updateCredential(request, response);
+});
+
 
 //logout
 // router.get('/logout', (request, response)=>{

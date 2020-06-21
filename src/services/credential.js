@@ -64,6 +64,37 @@ service.getAllCredentials =  async (request, response)=>{
     });
 }
 
+//delete Credential
+service.deleteCredential = async (request, response)=>{
+    
+    await Credential.findByIdAndDelete({_id: request.params['credential_id']})
+    .then((crdentialdeleted)=>{
+        if(crdentialdeleted){
+            UserData.updateOne({userid : request.params['user_id']}, {$pull : {credentials : request.params['credential_id']}})
+                .then((updated)=>{
+                    if(updated){
+                        return response.status(200).json('Credential Deleted Succussfully');
+                    }else{
+                        return response.status(200).json('Failed to delete credential from user');
+                    }
+                });
+    }else{
+        return response.status(200).json('Failed to delete credential');
+
+    }   
+    });
+}
+
+//update credential
+service.updateCredential= async (request, response)=>{
+    await Credential.updateOne({_id : request.params['credential_id']}, request.body)
+    .then((credentialupdated)=>{
+        //if task updated
+        if(credentialupdated) return response.status(200).json('Credential Updated!');
+        else return response.json('Failed to update credential');
+    });
+}
+
 
 
 module.exports = service;
