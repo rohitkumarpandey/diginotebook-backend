@@ -5,14 +5,14 @@ let service = {};
 
 //adding credential
 service.addCredential = async(request, response)=>{
-    await UserData.findOne({userid : request.params['user_id']})
+    await UserData.findOne({userid : request.params['userid']})
     .then((user)=>{
         if(!user){ //if user doensn't has any task 
             Credential.create(request.body)
             .then((credentialcreated)=>{
                 //if task created successfully
                 if(credentialcreated){
-                    UserData.create({userid :  request.params['user_id'] , credentials : credentialcreated._id})
+                    UserData.create({userid :  request.params['userid'] , credentials : credentialcreated._id})
                     .then((usercreated)=>{
                         //if user created successfully and task added to it
                         if(usercreated) return response.json('Credential Added');
@@ -20,15 +20,15 @@ service.addCredential = async(request, response)=>{
                     
                 }
             });
-        }else{ //if user already has tasks 
+        }else{ //if user already has Credential 
             
             Credential.create(request.body)
             .then((credentialcreated)=>{
-                //if task created successfully
+                //if Credential created successfully
                 if(credentialcreated){
                     UserData.updateOne({userid : user.userid}, {$addToSet : {credentials : credentialcreated._id}})
                     .then((updated)=>{
-                        //if task added to user successfully
+                        //if Credential added to user successfully
                         if(updated){
                             return response.status(200).json('Credential Added');
 
@@ -39,7 +39,7 @@ service.addCredential = async(request, response)=>{
                     
                     
                 }else{
-                     //if task failed to create
+                     //if Credential failed to create
                      return responsestatus(500).json('Failed to add Credential');
 
 
@@ -66,11 +66,10 @@ service.getAllCredentials =  async (request, response)=>{
 
 //delete Credential
 service.deleteCredential = async (request, response)=>{
-    
     await Credential.findByIdAndDelete({_id: request.params['credential_id']})
     .then((crdentialdeleted)=>{
         if(crdentialdeleted){
-            UserData.updateOne({userid : request.params['user_id']}, {$pull : {credentials : request.params['credential_id']}})
+            UserData.updateOne({userid : request.params['userid']}, {$pull : {credentials : request.params['credential_id']}})
                 .then((updated)=>{
                     if(updated){
                         return response.status(200).json('Credential Deleted Succussfully');
@@ -89,7 +88,7 @@ service.deleteCredential = async (request, response)=>{
 service.updateCredential= async (request, response)=>{
     await Credential.updateOne({_id : request.params['credential_id']}, request.body)
     .then((credentialupdated)=>{
-        //if task updated
+        //if Credential updated
         if(credentialupdated) return response.status(200).json('Credential Updated!');
         else return response.json('Failed to update credential');
     });

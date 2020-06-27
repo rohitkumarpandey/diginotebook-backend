@@ -54,27 +54,21 @@ service.addTask = async(request, response)=>{
 //get all user pending tasks
 service.getUserTasks = async (request, response)=>{
     await UserData.findOne({userid: request.params['userid']})
-    .populate('tasks', null, {taskStatus:{ completed : false}})
-    .then((user)=>{
-        if(user){
-            return response.status(200).send(user.tasks);
-        }else{
-            return response.status(200).json('You do not set any task yet');
-        }
+    
+    .populate({ path : 'tasks', match : { 'taskStatus.completed' : false} })
+    .exec(function(err, user){
+        if(err) throw new Error(err);
+        return response.status(200).send(user.tasks);
     });
 }
 
 //get all user completed tasks
 service.getCompletedTasks = async (request, response)=>{
     await UserData.findOne({userid: request.params['userid']})
-    .populate('tasks', null, {taskStatus:{ completed : true}})
-    .then((user)=>{
-        console.log(user);
-        if(user){
-            return response.status(200).send(user.tasks);
-        }else{
-            return response.status(200).json('You do not set any task yet');
-        }
+    .populate({ path : 'tasks', match : { 'taskStatus.completed': true}})
+    .exec(function(err, user){
+        if(err) throw new Error(err);
+        return response.status(200).send(user.tasks);
     });
 }
 
@@ -84,7 +78,7 @@ service.deleteTask = async (request, response)=>{
     await Task.findByIdAndDelete({_id: request.params['task_id']})
     .then((taskdeleted)=>{
         if(taskdeleted){
-            UserData.updateOne({userid : request.params['user_id']}, {$pull : {tasks : request.params['task_id']}})
+            UserData.updateOne({userid : request.params['userid']}, {$pull : {tasks : request.params['task_id']}})
                 .then((updated)=>{
                     if(updated){
                         return response.status(200).json('Task Deleted Succussfully');

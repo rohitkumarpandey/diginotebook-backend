@@ -1,5 +1,7 @@
 const User = require('../model/user');
 const bcrypt = require('bcryptjs');
+const UserData = require('../model/userdata');
+const jwt = require('jsonwebtoken');
 
 let service = {}
 
@@ -22,11 +24,27 @@ service.register = async (request, response)=>{
                 User.create(request.body)
                 .then((user)=>{
                     //if registered successfully
-                    if(user) return response.status(200).json({success : true , userid :user._id, username : user.username});
+                    if(user){ 
+                        UserData.create({userid : user._id});
+                        
+                        const payload = {
+                            user : {
+                                id : user._id
+                            }
+                        };
+    
+                        jwt.sign(payload , "secret", {expiresIn : 36000}, (err, token) => {
+                             if(err)  throw err;
+                             return response.status(200).json({success :true , userid : user._id , username : user.username, token : token});
+    
+                             });
+                       
+                }else{
 
                     let err = new Error('Registration Failed!');
                     err.status = 500;
                     return response.send(err);
+                }
                 });
             });
         }

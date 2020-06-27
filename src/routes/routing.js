@@ -1,5 +1,6 @@
 const express = require('express');
 const routes = express.Router();
+const isAuthenticated = require('../middleware/authentication');
 const registration = require('../services/register');
 const loginService = require('../services/login');
 const taskService = require('../services/task');
@@ -25,62 +26,62 @@ routes.post('/register', (request, response, next)=>{
 
 
 //add task
-routes.post('/addTask/:userid', (request, response)=>{
+routes.post('/addTask/:userid',isAuthenticated, (request, response)=>{
     return taskService.addTask(request, response);
     
 });
 
 //get all pending tasks
-routes.get('/getPendingTasks/:userid', (request, response, next)=>{
+routes.get('/getPendingTasks/:userid', isAuthenticated,(request, response)=>{
    
     return taskService.getUserTasks(request, response);
 
 });
 //get all completed tasks
-routes.get('/getCompletedTasks/:userid', (request, response, next)=>{
+routes.get('/getCompletedTasks/:userid', isAuthenticated, (request, response)=>{
    
     return taskService.getCompletedTasks(request, response);
 
 });
 
 //delete task
-routes.delete('/deleteTask/:user_id/:task_id', (request, response, next)=>{
+routes.delete('/deleteTask/:userid/:task_id', isAuthenticated, (request, response, next)=>{
     return taskService.deleteTask(request, response);
 
 });
 
 //update Task
-routes.put('/updateTask/:task_id', (request, response, next)=>{
+routes.put('/updateTask/:userid/:task_id', isAuthenticated, (request, response)=>{
     return taskService.updateTask(request, response); 
 });
 
 //mark task completed
-routes.put('/taskCompleted/:task_id', (request, response, next)=>{
+routes.put('/taskCompleted/:userid/:task_id', isAuthenticated, (request, response)=>{
     return taskService.taskCompleted(request, response); 
 });
 
 //add credential
-routes.post('/addCredential/:user_id', (request, response, next)=>{
+routes.post('/addCredential/:userid', isAuthenticated, (request, response, next)=>{
     
     return credentialService.addCredential(request, response);
 
 });
 
 //get all credentials
-routes.get('/getAllCredentials/:userid', (request, response, next)=>{
+routes.get('/getAllCredentials/:userid', isAuthenticated, (request, response, next)=>{
    
     return credentialService.getAllCredentials(request, response);
 
 });
 
 //delete credential
-routes.delete('/deleteCredential/:user_id/:credential_id', (request, response, next)=>{
+routes.delete('/deleteCredential/:user_id/:credential_id', isAuthenticated, (request, response, next)=>{
     return credentialService.deleteCredential(request, response);
 
 });
 
 //update crdential
-routes.put('/updateCrdential/:credential_id', (request, response)=>{
+routes.put('/updateCrdential/:userid/:credential_id', isAuthenticated, (request, response)=>{
         return credentialService.updateCredential(request, response);
 });
 
