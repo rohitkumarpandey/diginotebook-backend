@@ -22,8 +22,8 @@ service.login = async(request, response)=>{
                         }
                     };
 
-                    jwt.sign(payload , "secret", {expiresIn : 36000}, (err, token) => {
-                         if(err)  throw err;
+                    jwt.sign(payload , "secret", {expiresIn : 60000}, (err, token) => {
+                         if(err)  throw err; 
                          return response.status(200).json({success :true , userid : user._id , username : user.username, token : token});
 
                          })

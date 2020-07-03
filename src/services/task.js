@@ -54,10 +54,10 @@ service.addTask = async(request, response)=>{
 //get all user pending tasks
 service.getUserTasks = async (request, response)=>{
     await UserData.findOne({userid: request.params['userid']})
-    
-    .populate({ path : 'tasks', match : { 'taskStatus.completed' : false} })
+    .populate({ path : 'tasks', match : { 'taskStatus.completed' : false}})
     .exec(function(err, user){
         if(err) throw new Error(err);
+        if(user.tasks.length == 0) return response.status(200).send([]);
         return response.status(200).send(user.tasks);
     });
 }
@@ -65,11 +65,13 @@ service.getUserTasks = async (request, response)=>{
 //get all user completed tasks
 service.getCompletedTasks = async (request, response)=>{
     await UserData.findOne({userid: request.params['userid']})
-    .populate({ path : 'tasks', match : { 'taskStatus.completed': true}})
+    .populate({ path : 'tasks', match : {'taskStatus.completed': true}})
     .exec(function(err, user){
         if(err) throw new Error(err);
+        if(user.tasks.length == 0) return response.status(200).send([]);
         return response.status(200).send(user.tasks);
-    });
+    })
+    .catch((err)=> response.status(200).json('Not found anything'));
 }
 
 //delete Task 

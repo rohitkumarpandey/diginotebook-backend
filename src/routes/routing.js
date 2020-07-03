@@ -5,6 +5,7 @@ const registration = require('../services/register');
 const loginService = require('../services/login');
 const taskService = require('../services/task');
 const credentialService = require('../services/credential');
+const jwt = require("jsonwebtoken");
 
 //ping server
 routes.get('/pingserver', (request, response)=>{
@@ -26,7 +27,7 @@ routes.post('/register', (request, response, next)=>{
 
 
 //add task
-routes.post('/addTask/:userid',isAuthenticated, (request, response)=>{
+routes.post('/addTask/:userid', isAuthenticated, (request, response)=>{
     return taskService.addTask(request, response);
     
 });
@@ -87,7 +88,9 @@ routes.put('/updateCrdential/:userid/:credential_id', isAuthenticated, (request,
 
 
 //logout
-// router.get('/logout', (request, response)=>{
+// routes.get('/logout', (request, response)=>{
+//     //jwt.destroy(token);
+
 //     request.logout();
 // });
 
