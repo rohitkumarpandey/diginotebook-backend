@@ -12,6 +12,9 @@ const userdata = new schema({
     ],
     credentials : [
         {type : schema.Types.ObjectId, ref : 'Credentials'}
+    ],
+    notes : [
+        {type : schema.Types.ObjectId, ref : 'Note'}
     ]
 });
 

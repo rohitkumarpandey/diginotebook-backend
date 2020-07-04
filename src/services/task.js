@@ -67,11 +67,11 @@ service.getCompletedTasks = async (request, response)=>{
     await UserData.findOne({userid: request.params['userid']})
     .populate({ path : 'tasks', match : {'taskStatus.completed': true}})
     .exec(function(err, user){
-        if(err) throw new Error(err);
+        if(err) throw new Error('Error');
         if(user.tasks.length == 0) return response.status(200).send([]);
         return response.status(200).send(user.tasks);
     })
-    .catch((err)=> response.status(200).json('Not found anything'));
+    .catch((error)=> response.status(200).json('Not found anything'));
 }
 
 //delete Task 

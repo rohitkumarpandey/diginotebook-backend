@@ -5,7 +5,9 @@ const registration = require('../services/register');
 const loginService = require('../services/login');
 const taskService = require('../services/task');
 const credentialService = require('../services/credential');
+const noteService = require('../services/note');
 const jwt = require("jsonwebtoken");
+const { request, response } = require('express');
 
 //ping server
 routes.get('/pingserver', (request, response)=>{
@@ -69,14 +71,14 @@ routes.post('/addCredential/:userid', isAuthenticated, (request, response, next)
 });
 
 //get all credentials
-routes.get('/getAllCredentials/:userid', isAuthenticated, (request, response, next)=>{
+routes.get('/getAllCredentials/:userid', isAuthenticated, (request, response)=>{
    
     return credentialService.getAllCredentials(request, response);
 
 });
 
 //delete credential
-routes.delete('/deleteCredential/:user_id/:credential_id', isAuthenticated, (request, response, next)=>{
+routes.delete('/deleteCredential/:userid/:credentialid', isAuthenticated, (request, response)=>{
     return credentialService.deleteCredential(request, response);
 
 });
@@ -85,6 +87,28 @@ routes.delete('/deleteCredential/:user_id/:credential_id', isAuthenticated, (req
 routes.put('/updateCrdential/:userid/:credential_id', isAuthenticated, (request, response)=>{
         return credentialService.updateCredential(request, response);
 });
+
+//get all note
+routes.get('/getnotes/:userid', isAuthenticated, (request, response)=>{
+    return noteService.getallnotes(request, response);
+});
+
+//add note
+routes.post('/addnote/:userid', isAuthenticated,(request, response)=>{
+    console.log('jerr');
+    return noteService.addnote(request, response);
+});
+
+//update note
+routes.put('/updatenote/:userid/:noteid', isAuthenticated,(request, response)=>{
+    return noteService.updatenote(request, response);
+});
+
+//delete note
+routes.delete('/deletenote/:userid/:noteid', isAuthenticated,(request, response)=>{
+    return noteService.deletenote(request, response);
+});
+
 
 
 //logout

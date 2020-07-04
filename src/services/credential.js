@@ -66,10 +66,10 @@ service.getAllCredentials =  async (request, response)=>{
 
 //delete Credential
 service.deleteCredential = async (request, response)=>{
-    await Credential.findByIdAndDelete({_id: request.params['credential_id']})
+    await Credential.findByIdAndDelete({_id: request.params['credentialid']})
     .then((crdentialdeleted)=>{
         if(crdentialdeleted){
-            UserData.updateOne({userid : request.params['userid']}, {$pull : {credentials : request.params['credential_id']}})
+            UserData.updateOne({userid : request.params['userid']}, {$pull : {credentials : request.params['credentialid']}})
                 .then((updated)=>{
                     if(updated){
                         return response.status(200).json('Credential Deleted Succussfully');
