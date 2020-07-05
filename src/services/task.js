@@ -68,10 +68,10 @@ service.getCompletedTasks = async (request, response)=>{
     .populate({ path : 'tasks', match : {'taskStatus.completed': true}})
     .exec(function(err, user){
         if(err) throw new Error('Error');
-        if(user.tasks.length == 0) return response.status(200).send([]);
-        return response.status(200).send(user.tasks);
+        if(user.tasks.length == 0) return response.status(200).send({success : false, errorMessage : 'You do not have completed any goal'});
+        return response.status(200).send({success : true, tasks : user.tasks});
     })
-    .catch((error)=> response.status(200).json('Not found anything'));
+    .catch((error)=> response.status(200).json({success : false, errorMessage : error}));
 }
 
 //delete Task 
